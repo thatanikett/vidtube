@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+.env.sample
+ideatoProject.txt
+
+
+.vscode
+.prettierrc
+jsconfig.json
+.prettierrc
+.prettierignore
+
+
