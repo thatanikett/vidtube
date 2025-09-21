@@ -3,7 +3,7 @@ import { APIerror } from "../utils/APIerror.js";
 import { User } from "../models/user.models.js";
 import { CloudinaryDelete, CloudinaryUpload } from "../utils/cloudinary.js";
 import { APIresponse } from "../utils/APIresponse.js";
-// import {upload} from "../middlewares/multer.middlewares.js"
+import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -72,7 +72,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const user = await User.create({
+    const user = await User.create({   //user injected to db
       fullName,
       avatar: avatar.url,
       coverimage: coverimage?.url || "",
@@ -153,5 +153,59 @@ const loginUser = asyncHandler(async (req, res) => {
   ))
 });
 
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const incomingRefreshToken = req.cookie.refreshtoken || req.body.refreshToken
 
-export { registerUser , loginUser };
+  if (!incomingRefreshToken) {
+    throw new APIerror(400, "refresh token is required");
+  }
+
+  try {
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    )
+    const user = await User.findById(decodedToken?._id)
+
+    if (!user) {
+      throw new APIerror(401, "invalid refresh token");
+    }
+
+    if (user.refreshToken !== incomingRefreshToken) {
+      throw new APIerror(401, "invalid refresh token");
+    }
+
+    const options = {
+      httpOnly: true,
+      sercure: process.env.NODE_ENV === "production"
+    }
+
+    //casted new name to refreshtoken
+    const {accessToken, refreshToken: newRefreshToken} = await generateAccessAndRefreshToken(user._id); 
+
+    return res
+    .status(200)
+    .accessToken("accessToken", accessToken, options)
+    .cookie("refreshToken", newRefreshToken, options)
+    .json(new APIresponse(
+      200,
+      {accessToken,
+      refreshToken: newRefreshToken
+      },
+      "Access token refreshed successfully"
+    ));
+
+  } catch (error) {
+    throw new APIerror(401, "invalid refresh token");
+  }
+});
+
+
+const LogoutUser = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(
+    //todo
+  )
+});
+
+
+export { registerUser , loginUser , refreshAccessToken };
