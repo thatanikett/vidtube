@@ -4,7 +4,6 @@ import { APIerror } from "../utils/APIerror.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 
-
 //verifies access token from client then injects user info into req object
 
 export const verifyJWT = asyncHandler(async (req, _, next) => {
