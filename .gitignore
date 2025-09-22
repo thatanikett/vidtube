@@ -4,7 +4,6 @@ dist
 .env.sample
 ideatoProject.txt
 
-
 .vscode
 .prettierrc
 jsconfig.json
