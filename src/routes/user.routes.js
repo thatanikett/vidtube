@@ -1,16 +1,6 @@
 import { Router } from "express"
 import {
-    registerUser , 
-    loginUser,
-    LogoutUser,
-    changCurrentUserPassword,
-    getCurrentUser,
-    updateAccountDetails,
-    updateUserAvatar,
-    updateUserCoverimage,
-    getUserChannelProfile,
-    getWatchHistory
-} from "../controllers/user.controllers.js"
+    registerUser, loginUser, LogoutUser, changCurrentUserPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverimage, getUserChannelProfile, getWatchHistory} from "../controllers/user.controllers.js"
 import {upload} from "../middlewares/multer.middlewares.js" 
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 
@@ -30,7 +20,7 @@ router.route("/register").post(
     ]),
     registerUser) //format -> router.route("path").httpmethod( middleware, controller, another controller...)
 
-Router.route("/login").post(verifyJWT, LoginUser)
+router.route("/login").post(loginUser)
 
 //SECURED ROUTES
 router.route("/logout").post(verifyJWT, LogoutUser)

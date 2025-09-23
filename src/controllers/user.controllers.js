@@ -4,6 +4,7 @@ import { User } from "../models/user.models.js";
 import { CloudinaryDelete, CloudinaryUpload } from "../utils/cloudinary.js";
 import { APIresponse } from "../utils/APIresponse.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import { url } from "inspector";
 
 const generateAccessAndRefreshToken = async (userId) => {
