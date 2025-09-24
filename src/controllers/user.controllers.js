@@ -113,13 +113,19 @@ const loginUser = asyncHandler(async (req, res) => {
   const {email, username, password } = req.body;
 
   //validation
-  if (!email?.trim()) {
-    throw new APIerror(400, "email is required");
+  if (!username && !email) {
+    throw new APIerror(400, "username or email is required");
   }
 
-    const user = await User.findOne({
-    $or: [{ username }, { email }], //find based on any one
-  });
+  const query = {};
+  if (username) {
+    query.username = username.toLowerCase();
+  }
+  if (email) {
+    query.email = email;
+  }
+
+  const user = await User.findOne(query);
 
   if (!user) {
     throw new APIerror(404, "user not found");
@@ -128,7 +134,7 @@ const loginUser = asyncHandler(async (req, res) => {
   //validating password
   const isPasswordCorrect = await user.isPasswordCorrect(password)
   if (!isPasswordCorrect) {
-    throw new APIerror(400, "invalid credentials");
+    throw new APIerror(400, "invalid password");
   }
 
   const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id)
@@ -324,7 +330,7 @@ const updateUserCoverimage = asyncHandler(async (req, res) => {
     req.user._id,
     {
       $set: {
-        avatar: coverimage.url
+        coverimage: coverimage.url
       }
     },
     {new: true}
